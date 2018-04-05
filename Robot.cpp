@@ -6,6 +6,8 @@
 #include <Talon.h>
 #include "WPILib.h"
 #include <XboxController.h> //gamepad
+#include <Spark.h>
+
 
 //Vision
 #include <CameraServer.h>
@@ -22,12 +24,12 @@ public:
 
 private:
 	frc::RobotDrive *myRobot;  // Robot drive system
-	//frc::Joystick *stick = new Joystick(0);
+	frc::Joystick *stick = new Joystick(0);
 	frc::LiveWindow *lw = frc::LiveWindow::GetInstance();
 	frc::Timer timer;
-	frc::Talon *rotator = new Talon(4);
-	frc::TalonSRX *frontLeft, *frontRight, *rearLeft, *rearRight;
-	frc::XboxController *gamepad = new XboxController(0); //gamepad
+	frc::Talon *frontLeft, *frontRight, *rearRight;
+	frc::Spark *rearLeft;
+	//frc::XboxController *gamepad = new XboxController(0);
 
 
 	static void VisionThread()
@@ -68,10 +70,10 @@ private:
 		std::thread visionThread(VisionThread);
 		visionThread.detach();
 
-		frontLeft = new TalonSRX(2);
-		frontRight = new TalonSRX(0);
-		rearLeft = new TalonSRX(3);
-		rearRight = new TalonSRX(1);
+		frontLeft = new Talon(0);
+		frontRight = new Talon(2);
+		rearLeft = new Spark(3);
+		rearRight = new Talon(1);
 		myRobot = new RobotDrive(frontLeft,frontRight,rearLeft,rearRight);
 		myRobot->SetExpiration(0.1);
 	}
@@ -97,20 +99,8 @@ private:
 
 	void TeleopPeriodic() override {
 		// Drive with arcade style (use right stick)
-		myRobot->TankDrive(gamepad->GetRawAxis(2), gamepad->GetRawAxis(5));
+		myRobot->ArcadeDrive(stick);
 		//Mecanum drive may be best here
-/*
-		if (stick->GetRawButton(1))
-		{
-			rotator->Set(1);
-		}
-
-		if (stick->GetRawButton(2))
-		{
-			rotator->StopMotor();
-		}
-
-*/
 	}
 
 	void TestPeriodic() override {
@@ -119,4 +109,5 @@ private:
 };
 
 START_ROBOT_CLASS(Robot)
+
 
